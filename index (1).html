@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ECEN 453 Robotics – Exam-Format Mock Test</title>
+<style>
+:root{--bg:#f3f6f4;--card:#fff;--ink:#14231c;--mut:#5a6b62;--line:#cfdad3;--acc:#0f6e56;--ok:#dff3e8;--okb:#1d8f5f;--no:#fbe3e1;--nob:#c2412f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1713;--card:#18231d;--ink:#e8f1ec;--mut:#9bb0a5;--line:#2c3d34;--acc:#4cc9a0;--ok:#173a29;--okb:#4cc9a0;--no:#3e1f1b;--nob:#ff8a78}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:700px;margin:0 auto;padding:20px 16px 48px}
+h1{font:700 1.5rem/1.2 "Trebuchet MS",Verdana,sans-serif;margin:8px 0 4px}
+.sub{color:var(--mut);margin:0 0 16px}
+.track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+#bar{height:100%;width:0;background:var(--acc);transition:width .3s}
+#cnt{font:.9rem "Trebuchet MS",Verdana,sans-serif;color:var(--mut);margin:8px 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+#q{font-size:1.1rem;font-weight:700;margin:0 0 14px}
+.pg{font:.85rem "Trebuchet MS",Verdana,sans-serif;color:var(--acc);margin:0 0 6px}
+button{font:inherit}
+#opts button,.set{display:block;width:100%;text-align:left;margin:0 0 8px;padding:12px 14px;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;cursor:pointer}
+#opts button:hover:not(:disabled),.set:hover{border-color:var(--acc)}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#opts button.ok{background:var(--ok);border-color:var(--okb)}
+#opts button.no{background:var(--no);border-color:var(--nob)}
+#fb{margin-top:12px;padding:12px 14px;border-left:4px solid var(--acc);background:var(--bg);border-radius:4px}
+#fb p{margin:6px 0 0}
+.go{margin-top:14px;padding:11px 20px;background:var(--acc);color:var(--bg);border:0;border-radius:8px;font:700 1rem "Trebuchet MS",Verdana,sans-serif;cursor:pointer}
+.go.alt{background:transparent;color:var(--acc);border:1.5px solid var(--acc);margin-left:8px}
+.set b{display:block;font-family:"Trebuchet MS",Verdana,sans-serif}
+.set span{color:var(--mut);font-size:.92rem}
+ul{padding-left:20px}
+input,textarea{width:100%;font:inherit;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{min-height:130px;font-family:Consolas,monospace;font-size:.9rem}
+pre{white-space:pre-wrap;background:var(--bg);padding:10px;border-radius:6px;overflow-x:auto;font:.88rem/1.45 Consolas,monospace}
+</style>
+</head>
+<body>
+<main>
+<h1>Robotics Technology Mock Test</h1>
+<p class="sub">ECEN 453 · 40 Identification · 20 Multiple Choice · 20 True/False · 2 Problem Solving · Reviewer-based</p>
+<div class="track"><div id="bar"></div></div>
+<div id="cnt"></div>
+<div class="card">
+<div id="home"></div>
+<div id="stage" hidden><p class="pg" id="pg"></p><p id="q"></p><div id="opts"></div><div id="fb" hidden></div><button class="go" id="next" hidden>Next</button></div>
+<div id="end" hidden></div>
+</div>
+</main>
+<script>
+// Identification: [question, accepted answers separated by |, reviewer page]
+const ID=[
+["What does SCOT stand for?","shared computer operated transport",3],
+["What does SCARA stand for?","selective compliant articulated robot arm",3],
+["What does BRAVE stand for?","bomb removal automated vehicle",3],
+["What does API stand for? (Keras is described as a high-level one)","application programming interface",22],
+["What does ASIMO stand for?","advanced step in innovative mobility",3],
+["What does GCC stand for?","gnu compiler collection",24],
+["What does IDE stand for?","integrated development environment",24],
+["What does GUIDE stand for in MATLAB?","graphical user interface development environment",26],
+["What does LDR stand for?","light dependent resistor",12],
+["What does UNIX stand for?","uniplexed information computing system|uniplexed information and computing system",24],
+["What does DOF stand for?","degrees of freedom|degree of freedom",4],
+["What does the “VMPGO” of PUP stand for?","vision mission philosophy goals and objectives|vision mission philosophy goals objectives",1],
+["What does MATLAB stand for?","matrix laboratory",5],
+["Who invented the textile machine operated by punch cards?","joseph-marie jacquard|jacquard",2],
+["Who designed the analytical engine, the “world’s first general-purpose computer”?","charles babbage|babbage",2],
+["Who did mathematical analysis on logic that became Boolean Algebra?","george boole|boole",2],
+["Who invented the talking doll in 1887?","thomas edison|edison",2],
+["Who designed a motorized crane with a gripper to remove ingots from a furnace in 1892?","seward babbitt|babbitt",2],
+["Who is the MIT professor who published Cybernetics?","norbert wiener|wiener",3],
+["Who created the first microchip in 1958?","jack kilby|kilby",3],
+["Who coined the term data mining (“data is the new oil”)?","clive humby|humby",3],
+["Who coined IoT in 1999?","kevin ashton|ashton",30],
+["Who created Python?","guido van rossum|van rossum",20],
+["Who created the C programming language?","dennis ritchie|ritchie",24],
+["Which NASA Mars rover was the first deployed on Mars?","sojourner",3],
+["Which NASA Mars rover is described as the one that got stuck on Mars?","spirit",3],
+["What is the world’s first anthropomorphic robot (Waseda University)?","wabot-1|wabot1|wabot",3],
+["Who introduced the word “robot” in the 1921 play Rossum’s Universal Robots?","karel capek|capek|karel čapek|čapek",3],
+["How many digital I/O pins does the Arduino Nano have?","22",27],
+["How many digital I/O pins does the Arduino Uno have?","14",27],
+["How many digital I/O pins does the Arduino Mega 2560 have?","54",27],
+["How many analog inputs does the Arduino Mega have?","16",27],
+["Which Arduino board was the first with built-in USB communication, able to emulate keyboards and mice?","leonardo|arduino leonardo",28],
+["Which Arduino function runs only once at startup or after a reset?","setup|setup()",28],
+["Which MATLAB command clears the Command Window without removing variables?","clc",5],
+["Which printf format specifier is used for floating-point values?","%f",25],
+["What wrist motion is the up-and-down movement?","pitch",4],
+["Which type of robot memorizes and records motion paths and repeats them without further guidance?","playback robot|playback robots|playback",4],
+["What kind of sensors are transducers that require an external power source?","passive sensors|passive sensor|passive",12],
+["What is the dielectric constant of water in Table 3?","80",14]
+];
+// Multiple choice: [question, options, answer index, source]
+const MC=[
+["A user-program that has the ability to move a robot axis to any position within its range",["Pick-to-place","Point-to-point","Positive stop","Continuous path"],1,"Prof. quiz · p.4"],
+["______ a professor at MIT publishes cybernetics, a book describing communications and control in electronic, mechanical and biological systems.",["Willard Polard","Seward Babbit","John Mauchly","Norbert Wiener"],3,"Prof. quiz · p.3"],
+["______ is a type of actuator of industrial robots that has great force capability and great holding strength when stopped.",["Pneumatic","Steam","Hydraulic","Electric"],2,"Prof. quiz"],
+["The individual sections of the robot arm between the joints are ____.",["Arms","Branches","Links","Axes"],2,"Prof. quiz"],
+["The first patent for an industrial robot was developed in 1954 by Devol.",["TRUE","FALSE"],0,"Prof. quiz · p.3 (reviewer: designed 1954, patent 1961)"],
+["A system in which the precise movement of a large load is controlled by a relatively weak signal.",["Hydraulic","Electro","Synchro","Servo"],3,"Prof. quiz"],
+["Which is NOT the usual power source that steers the arm of the robot?",["Thermionic","Hydraulic","Pneumatic","Electric"],0,"Prof. quiz · p.4"],
+["What are the basic categories of industrial robot?",["Fast and slow","Mechanical and electrical","Autobots and decepticons","Pick and place manipulator and intelligent robot"],3,"Prof. quiz"],
+["A high-level computer language developed by Robotronic Corporation to make commanding a personal robot easier.",["Androtext","ARMBASIC","AML","HELP"],0,"Prof. quiz"],
+["Describes the wrist’s angular movement from the left side to the right side.",["Pitch","Roll","Rotation","Yaw"],3,"Prof. quiz · p.4"],
+["Refers to the movement of the base of the robot.",["Actuation","Walk","Travel","Precission"],2,"Prof. quiz"],
+["______ is a device connected to the wrist’s flange of the manipulator’s arm, used in many situations in the production area.",["End effector","Manipulator","Actuator","Controller"],0,"Prof. quiz · p.4"],
+["______ robot is primarily used for machining processes.",["Cincinatti T3","DEA PRAMA","ADEPT One","Jolly 80"],0,"Prof. quiz"],
+["The essential feature of a non-servo controlled robot is that ____",["It requires programming logic controller","Each of its axis can move only between hardware stops","It is small","It is used for heavy loads"],1,"Prof. quiz · p.4"],
+["Robot classification is usually based on ____",["Its manipulating anatomy","Its controller design","Its suitable for production tasks","All of the above"],3,"Prof. quiz · p.4"],
+["How many analog inputs does the Arduino Uno have?",["4","6","8","16"],1,"p.27"],
+["Which proximity sensor detects ferrous and non-ferrous metal objects using a coil?",["Capacitive","Inductive","Photoelectric","Ultrasonic"],1,"p.13"],
+["What is the approximate angle of the main cone of an ultrasonic sensor’s radiation pattern?",["3°","5°","30°","45°"],1,"p.15"],
+["Which solving method transforms equations to upper triangular form then uses back substitution?",["Cramer’s rule","Graphical method","Gauss elimination","Crout’s method"],2,"p.11"],
+["Which Industrial Revolution (1969–2010) brought the personal computer, IC and the internet?",["1.0","2.0","3.0","4.0"],2,"p.30"]
+];
+// True/False: [statement, truth, explanation, page]
+const TF=[
+["The word “robot” comes from the Czech word robota, meaning serf or forced labor.",true,"",3],
+["Isaac Asimov first introduced the term robotics in 1941.",true,"",4],
+["A Cartesian robot works within a cylindrical work envelope.",false,"It works in three linear directions only (up/down, left/right, front/back).",4],
+["Sojourner was the first rover deployed on Mars.",true,"",3],
+["The Arduino Uno has 14 digital I/O pins.",true,"",27],
+["The Arduino Mega has 15 analog inputs.",false,"It has 16 analog inputs (15 is its PWM count).",27],
+["Passive sensors generate a signal and measure the reflection from the target.",false,"That describes active sensors.",13],
+["An object placed in an ultrasonic sensor’s blind zone produces a stable output.",false,"It produces an unstable output.",15],
+["In MATLAB, adding a semicolon at the end of a command suppresses its output.",true,"",5],
+["A MATLAB variable name may begin with a digit.",false,"It must begin with a letter.",6],
+["Python was created by Guido van Rossum and released in 1991.",true,"",20],
+["C is a procedural language, while C++ also supports object-oriented programming.",true,"",24],
+["The printf() function automatically adds a newline at the end of its output.",false,"It does not.",25],
+["LU decomposition factors matrix [A] into a lower and an upper triangular matrix.",true,"",11],
+["Matrix multiplication is valid when the columns of the left matrix equal the rows of the right matrix.",true,"",9],
+["Capacitive proximity sensors can only detect metals.",false,"They also sense paper, glass, liquids and cloth.",13],
+["In Arduino, loop() executes only once at startup.",false,"setup() runs once; loop() repeats.",28],
+["The assembly line belongs to Industrial Revolution 2.0.",true,"",30],
+["Cramer’s Rule is best suited for large systems of equations.",false,"It suits small systems (2×2 or 3×3).",8],
+["Water has a high dielectric constant (80), which makes it easy for a capacitive sensor to detect.",true,"",14]
+];
+// Problem solving: [title, task, model answer, note]
+const PR=[
+["Problem 1 · MATLAB: Worker’s Pay (10 pts)","Write a script that asks the user for hours worked and hourly wage. Calculate pay (overtime above 40 hours is paid at 1.5× rate). Display the result.",
+`% workerPay.m
+hours = input('Hours worked: ');
+wage  = input('Hourly wage: ');
+
+if hours > 40
+    pay = 40*wage + (hours-40)*wage*1.5;
+else
+    pay = hours*wage;
+end
+
+disp(['Total pay: ', num2str(pay)]);`,"Check: 45 h at 10/h gives 400 + 5×15 = 475. Save as a .m file and run it (reviewer p.7)."],
+["Problem 2 · Python: Lists (10 pts)","Given the code below, fix it so it runs, then write the output. A and B are not defined yet, so Python raises a NameError. Define them first, then append 'World' and print.\n\npi = 3.14159\nvarList = [1, 2, 3, A, B, 'Hello', pi]\nvarList.append('World')\nprint(varList)",
+`pi = 3.14159
+A = 4          # any values; define before use
+B = 5
+varList = [1, 2, 3, A, B, 'Hello', pi]
+varList.append('World')   # adds to the END of the list
+print(varList)
+
+# Output:
+# [1, 2, 3, 4, 5, 'Hello', 3.14159, 'World']`,"Python lists are not covered in the reviewer, so this item follows your friend’s tip and the screenshot."]
+];
+const D={id:ID,mc:MC,tf:TF,pr:PR},N={id:'Identification',mc:'Multiple Choice',tf:'True or False',pr:'Problem Solving'};
+const $=id=>document.getElementById(id);
+const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const nz=s=>s.toLowerCase().replace(/[^a-z0-9%\u010d]/g,'');
+let Q,i,sc,miss;
+function home(){
+  $('stage').hidden=$('end').hidden=true;$('home').hidden=false;$('bar').style.width='0';$('cnt').textContent='';
+  $('home').innerHTML='<p>Questions reshuffle inside each part every time. Typed answers ignore capitals and punctuation.</p><button class="set" onclick="start([\'id\',\'mc\',\'tf\',\'pr\'])"><b>Full exam · 82 items</b><span>40 ID, 20 MCQ, 20 T/F, then the 2 problems</span></button>'
+  +['id','mc','tf','pr'].map(k=>'<button class="set" onclick="start([\''+k+'\'])"><b>'+N[k]+' only · '+D[k].length+' items</b></button>').join('');
+}
+function start(ks){
+  Q=[];ks.forEach(k=>(k==='pr'?D[k]:sh(D[k])).forEach(x=>Q.push({k,x})));
+  sc={id:0,mc:0,tf:0};miss=[];i=0;$('home').hidden=true;$('end').hidden=true;$('stage').hidden=false;show();
+}
+function hdr(){$('cnt').textContent='Item '+(i+1)+' of '+Q.length+' · '+N[Q[i].k]+' · Score '+(sc.id+sc.mc+sc.tf)}
+function show(){
+  const {k,x}=Q[i];hdr();$('bar').style.width=(i/Q.length*100)+'%';$('fb').hidden=$('next').hidden=true;
+  const box=$('opts');box.innerHTML='';
+  if(k==='id'){
+    $('pg').textContent='Identification · reviewer p.'+x[2];$('q').textContent=x[0];
+    box.innerHTML='<input id="a" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type your answer"><button class="go" id="chk">Check</button>';
+    $('a').focus();$('chk').onclick=chkId;$('a').onkeydown=e=>{if(e.key==='Enter')chkId()};
+  }else if(k==='pr'){
+    $('pg').textContent=x[0];$('q').style.whiteSpace='pre-wrap';$('q').textContent=x[1];
+    box.innerHTML='<textarea placeholder="Write your answer here first…"></textarea><button class="go" id="rev">Show model answer</button>';
+    $('rev').onclick=()=>{const f=$('fb');f.hidden=false;f.innerHTML='<b>Model answer</b><pre></pre><p></p>';f.querySelector('pre').textContent=x[2];f.querySelector('p').textContent=x[3];nxt()};
+  }else{
+    $('q').style.whiteSpace='';const o=k==='mc'?x[1]:['True','False'];
+    $('pg').textContent=k==='mc'?'Multiple choice · '+x[3]:'True or False · reviewer p.'+x[3];$('q').textContent=x[0];
+    o.forEach((t,j)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>pickOpt(b,j,o);box.appendChild(b)});
+  }
+}
+function nxt(){$('next').hidden=false;$('next').textContent=i===Q.length-1?'See results':'Next';$('next').focus()}
+function chkId(){
+  const x=Q[i].x,u=nz($('a').value);if(!u)return;
+  const ok=x[1].split('|').some(a=>{a=nz(a);return u===a||(a.length>6&&u.includes(a))});
+  $('a').disabled=$('chk').disabled=true;const f=$('fb');f.hidden=false;
+  if(ok){sc.id++;f.innerHTML='<b>✅ Correct!</b><p>Answer: '+x[1].split('|')[0]+' (p.'+x[2]+')</p>'}
+  else{const m={k:'id',q:x[0],a:x[1].split('|')[0],p:'p.'+x[2]};miss.push(m);
+    f.innerHTML='<b>❌ Not quite.</b><p>Correct answer: <u>'+m.a+'</u> (p.'+x[2]+')</p><button class="go alt" id="ovr" style="margin:0">I was right (spelling or wording)</button>';
+    $('ovr').onclick=()=>{sc.id++;miss.splice(miss.indexOf(m),1);$('ovr').remove();hdr()}}
+  hdr();nxt();
+}
+function pickOpt(b,j,o){
+  const {k,x}=Q[i],ans=k==='mc'?x[2]:(x[1]?0:1),f=$('fb');
+  document.querySelectorAll('#opts button').forEach((e,n)=>{e.disabled=true;if(n===ans)e.classList.add('ok')});f.hidden=false;
+  const why=k==='tf'?(x[2]?' '+x[2]:''):'';
+  if(j===ans){sc[k]++;f.innerHTML='<b>✅ Correct!</b><p>'+o[ans]+'.'+why+'</p>'}
+  else{b.classList.add('no');miss.push({k,q:x[0],a:o[ans]+why,p:k==='mc'?x[3]:'p.'+x[3]});f.innerHTML='<b>❌ Not quite.</b><p>Correct answer: <u>'+o[ans]+'</u>.'+why+'</p>'}
+  hdr();nxt();
+}
+$('next').onclick=()=>{$('q').style.whiteSpace='';i++;i>=Q.length?finish():show()};
+function finish(){
+  $('bar').style.width='100%';$('stage').hidden=true;$('end').hidden=false;
+  const ks=[...new Set(Q.map(e=>e.k))],tot=ks.filter(k=>k!=='pr').reduce((s,k)=>s+D[k].length,0),got=sc.id+sc.mc+sc.tf;
+  $('end').innerHTML='<h1>'+got+' / '+tot+(tot?' ('+Math.round(got/tot*100)+'%)':'')+'</h1>'
+  +ks.filter(k=>k!=='pr').map(k=>'<p>'+N[k]+': <b>'+sc[k]+' / '+D[k].length+'</b></p>').join('')
+  +(ks.includes('pr')?'<p>Problem solving: self-check your answers against the model solutions (20 pts).</p>':'')
+  +(miss.length?'<p><b>Items you missed:</b></p><ul>'+miss.map(m=>'<li>'+m.q+' → <b>'+m.a+'</b> ('+m.p+')</li>').join('')+'</ul>':'<p>No mistakes. Perfect run.</p>')
+  +'<button class="go" onclick="start('+JSON.stringify(ks).replace(/"/g,"'")+')">Retake (reshuffled)</button><button class="go alt" onclick="home()">Back to menu</button>';
+}
+home();
+</script>
+</body>
+</html>
